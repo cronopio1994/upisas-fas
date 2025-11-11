@@ -23,25 +23,31 @@ class SignalBasedBaselineStrategy(Strategy):
 
         analysis_data["actions_needed"] = []
 
-        for mote in latest_motes:
+        for idx, mote in enumerate(latest_motes):
             signal = mote.get("highestReceivedSignal")
             if signal is None:
                 continue
 
-            current_power = mote.get("transmissionPower", 14)
+            current_power = mote.get("transmissionPower")
+            if current_power is None:
+                current_power = 7  # default value if missing
+
             if signal < self.MIN_SIGNAL:
-                new_power = min(current_power + 1, 14)
+                new_power = min(current_power + 1, 15)  # maxValue from adaptation options
             elif signal > self.MAX_SIGNAL:
-                new_power = max(current_power - 1, 0)
+                new_power = max(current_power - 1, -1)  # minValue from adaptation options
             else:
                 continue
 
-            mote_id = mote.get("eui", mote.get("startOffSet"))
-            analysis_data["actions_needed"].append((mote_id, new_power))
+            # Use the index as the ID because ExecuteHandler expects an integer index
+            analysis_data["actions_needed"].append((idx, new_power))
 
         return bool(analysis_data["actions_needed"])
 
     def plan(self):
+        """
+        Create the plan_data dictionary for the Execute endpoint.
+        """
         analysis_data = self.knowledge.__dict__.setdefault("analysis_data", {})
         actions = analysis_data.get("actions_needed", [])
 
@@ -50,10 +56,10 @@ class SignalBasedBaselineStrategy(Strategy):
 
         self.knowledge.plan_data = {"items": []}
 
-        for mote_id, new_power in actions:
+        for mote_idx, new_power in actions:
             self.knowledge.plan_data["items"].append({
-                "id": mote_id,
-                "adaptations": [{"name": "transmissionPower", "value": new_power}]
+                "id": mote_idx,
+                "adaptations": [{"name": "power", "value": new_power}]
             })
 
         return True
