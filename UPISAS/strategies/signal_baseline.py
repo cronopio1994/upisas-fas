@@ -1,9 +1,20 @@
 from UPISAS.strategy import Strategy
 
-class SignalBasedBaselineStrategy(Strategy):
-    MIN_SIGNAL = -48  # dBm
-    MAX_SIGNAL = -42  # dBm
+# The Signal-Based Adaptation Strategy focuses on regulating the transmission power
+# based on the observed Received Signal Strength Indicator (RSSI).
 
+class SignalBasedBaselineStrategy(Strategy):
+    """
+    Implements the baseline Signal-Based adaptation strategy from the DingNet exemplar.
+    
+    This strategy adapts the mote's transmission power (Ptx) based on the highest 
+    signal strength (RSSI) received by any gateway. It aims to reduce energy 
+    consumption (R2) while maintaining reliability (R1).
+    """
+
+    MIN_SIGNAL = -48  # dBm: If RSSI is below this, power must increase (signal too weak)
+    MAX_SIGNAL = -42  # dBm: If RSSI is above this, power must decrease (signal too strong, waste of energy)
+ 
     def analyze(self):
         """
         Analyze the latest monitored data to decide if any mote requires adaptation.

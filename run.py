@@ -6,7 +6,6 @@ import sys
 import time
 import traceback
 
-# Your manual adaptation payload
 pre_adaptation = {
     "items": [
         {"id": 0, "adaptations": [{"name": "power", "value": 12}]},
@@ -22,12 +21,10 @@ def get_latest_motes(strategy):
 
     latest = motes_history[-1]
 
-    # Sometimes DingNet nests lists like [[{...}, {...}]]
     if isinstance(latest, list) and len(latest) > 0 and isinstance(latest[0], list):
         latest = latest[0]
 
     return latest
-# ---- end helper ----
 
 if __name__ == '__main__':
     
