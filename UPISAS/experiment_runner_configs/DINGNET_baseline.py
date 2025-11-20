@@ -57,7 +57,7 @@ class RunnerConfig:
         # The key metrics for comparing S1 (Signal-Based) are Reliability and Energy.
         self.run_table_model = RunTableModel(
                     factors=[factor1],
-                    repetitions = 3,
+                    repetitions = 30,
                     data_columns=[
                         # R1: Reliability (minimized)
                         "avg_packet_loss",  
